@@ -255,10 +255,11 @@ class _AddStudentViewState extends State<AddStudentView> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           widget.appBarTittleName,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white, fontSize: 20),
         ),
         centerTitle: true,
         actions: const [],

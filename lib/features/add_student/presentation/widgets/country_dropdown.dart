@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:student_crud_app/data/model/country_model.dart';
 
 class CountryPicker extends StatefulWidget {
   final Function(Country) onCountrySelected;
@@ -29,44 +30,33 @@ class _CountryPickerState extends State<CountryPicker> {
   @override
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(left: 10),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black),
-        borderRadius: BorderRadius.circular(4),
+    return DropdownButtonFormField<Country>(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      decoration: const InputDecoration(
+          border: OutlineInputBorder(), contentPadding: EdgeInsets.all(13)),
+      value: _selectedCountry,
+      hint: const Text(
+        'Select a country',
       ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<Country>(
-          isExpanded: true,
-          value: _selectedCountry,
-          hint: const Text('Select a country'),
-          onChanged: (Country? newValue) {
-            setState(() {
-              _selectedCountry = newValue;
-              widget.onCountrySelected(newValue!);
-            });
-          },
-          items: countries.map<DropdownMenuItem<Country>>((Country country) {
-            return DropdownMenuItem<Country>(
-              value: country,
-              child: Row(
-                children: <Widget>[
-                  Text(country.flagCode),
-                  const SizedBox(width: 10),
-                  Text(country.name),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-      ),
+      onChanged: (newValue) {
+        setState(() {
+          _selectedCountry = newValue;
+          widget.onCountrySelected(newValue!);
+        });
+      },
+      validator: (value) => value == null ? 'Select the Country' : null,
+      items: countries.map<DropdownMenuItem<Country>>((Country country) {
+        return DropdownMenuItem<Country>(
+          value: country,
+          child: Row(
+            children: <Widget>[
+              Text(country.flagCode),
+              const SizedBox(width: 10),
+              Text(country.name),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
-}
-
-class Country {
-  final String name;
-  final String flagCode;
-
-  Country({required this.name, required this.flagCode});
 }
