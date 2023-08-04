@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:multiple_result/multiple_result.dart';
 import 'package:student_crud_app/data/model/student_model.dart';
 import 'package:student_crud_app/data/service/student_db_service.dart';
-import 'package:student_crud_app/main.dart';
 import 'package:http/http.dart' as http;
 import 'package:student_crud_app/shared/exception/baseexception.dart';
 
@@ -26,7 +25,6 @@ class StudentRepository {
         body: json.encode({"email": username, "password": password}),
         Uri.parse('${apiUrl}signup'),
       );
-      final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
         return const Success(true);
       } else {
@@ -104,7 +102,7 @@ class StudentRepository {
       });
 
       var response = await dio.request(
-        'https://studentcrudfastapi-production.up.railway.app/addstudent?user_id=$id',
+        '${apiUrl}addstudent?user_id=$id',
         options: Options(
           method: 'POST',
           headers: headers,
@@ -123,65 +121,50 @@ class StudentRepository {
     }
   }
 
-  // Future<Result<List<Studentmodel>, Exception>> fetchStudents() async {
-  //   try {
-  //     final response = await dio.get("${apiUrl}getAllstudents/");
-  //     print(response.data);
-  //     if (response.statusCode == 200) {
-  //       var data = response.data as List;
-  //       var bookList = data.map((e) => Studentmodel.fromMap(e)).toList();
+  Future<Result<bool, Exception>> updateStudent(
+      {required String studenName,
+      required String studentAge,
+      required String studentDob,
+      required String studentGender,
+      required String studentCountry,
+      required String studentImage,
+      required String fileName,
+      required int studentId,
+      Function(int, int)? onSendProgress}) async {
+    try {
+      final userId = await studentDbService.getuserData();
+      var headers = {
+        'Content-Type': 'multipart/form-data',
+        'Accept': 'application/json'
+      };
+      var data = FormData.fromMap({
+        'image': await MultipartFile.fromFile(studentImage, filename: fileName),
+        'student_name': studenName,
+        'student_age': studentAge,
+        'date_of_birth': studentDob,
+        'gender': studentGender,
+        'country': studentCountry,
+        'user_id': userId,
+        'student_id': studentId
+      });
 
-  //       return Success(bookList);
-  //     } else {
-  //       return Error(Exception(Exception('Failed to load books')));
-  //     }
-  //   } catch (e) {
-  //     return Error(Exception(e));
-  //   }
-  // }
+      var response = await dio.request('${apiUrl}update',
+          options: Options(
+            method: 'PUT',
+            headers: headers,
+          ),
+          data: data,
+          onReceiveProgress: onSendProgress);
 
-  // Future<Result<bool, Exception>> createBook(Book book) async {
-  //   try {
-  //     final response = await dio.post('${apiUrl}books/',
-  //         data: {"id": book.id, "title": book.title, "author": book.author},
-  //         options: Options(headers: {'Content-type': 'application/json'}));
-
-  //     if (response.statusCode == 200) {
-  //       return const Success(true);
-  //     } else {
-  //       return Error(Exception('Failed to create a book'));
-  //     }
-  //   } catch (e) {
-  //     return Error(Exception(e));
-  //   }
-  // }
-
-  // Future<Result<bool, Exception>> updateBook(Book book) async {
-  //   try {
-  //     var headers = {
-  //       'Content-Type': 'application/json',
-  //       'Accept': 'application/json'
-  //     };
-  //     var data = json
-  //         .encode({"id": book.id, "title": book.title, "author": book.author});
-  //     final response = await dio.request(
-  //       '${apiUrl}books/${book.id}',
-  //       data: data,
-  //       options: Options(
-  //         method: 'PUT',
-  //         headers: headers,
-  //       ),
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       return const Success(true);
-  //     } else {
-  //       return Error(Exception('Failed to update the book'));
-  //     }
-  //   } catch (e) {
-  //     return Error(Exception(e));
-  //   }
-  // }
+      if (response.statusCode == 200) {
+        return const Success(true);
+      } else {
+        return Error(Exception('Unable to Update'));
+      }
+    } catch (e) {
+      return Error(Exception(e.toString()));
+    }
+  }
 
   Future<Result<bool, Exception>> deleteStudent(
       {required int userId, required int studentId}) async {
@@ -193,7 +176,7 @@ class StudentRepository {
       var data = json.encode({"user_id": userId, "student_id": studentId});
       var dio = Dio();
       var response = await dio.request(
-        'https://studentcrudfastapi-production.up.railway.app/delete',
+        '${apiUrl}delete',
         options: Options(
           method: 'DELETE',
           headers: headers,

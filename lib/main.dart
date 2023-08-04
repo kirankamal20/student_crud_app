@@ -45,10 +45,14 @@ class MyApp extends StatelessWidget {
             color: Colors.white,
           ),
         ),
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Color.fromARGB(255, 3, 3, 77),
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
-            backgroundColor:
-                const MaterialStatePropertyAll(Color.fromARGB(255, 3, 3, 77)),
+            backgroundColor: const MaterialStatePropertyAll(
+              Color.fromARGB(255, 3, 3, 77),
+            ),
             shape: MaterialStatePropertyAll(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(5),
